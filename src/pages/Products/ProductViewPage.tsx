@@ -26,7 +26,6 @@ export default function ProductViewPage() {
   const data: Product = PRODUCTS.find((x) => x.id === Number(id)) || PRODUCTS[0];
   const [quantity, setQty] = useState<number>(1);
   useEffect(() => setQty(1), [id]);
-  const pct = Math.round(((data?.was - data?.price) / data?.was) * 100);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const handleAddToCart = (product: any) => {
@@ -43,41 +42,54 @@ export default function ProductViewPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 sm:px-10 py-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-10">
       <Link to="/">
-        <button className="flex items-center gap-1 text-sm font-[Karla] text-[#8a7860] mb-6 hover:text-[#2B1D14]">
+        <button className="flex items-center gap-1 text-sm font-[Karla] text-[#8a7860] mb-4 sm:mb-6 hover:text-[#2B1D14]">
           <ChevronLeft className="w-4 h-4" /> Back to shop
         </button>
       </Link>
-      <div className="grid md:grid-cols-2 gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
         {/* --- was: <div className="relative rounded-2xl overflow-hidden"> with a single ProductArt --- */}
         <ProductImageGallery
           images={data?.images}
           alt={data?.name}
           overlay={
             <>
-              <span className="absolute top-4 left-4 bg-[#8C3B2E] text-white text-xs font-[Karla] font-bold px-3 py-1.5 rounded-full">
-                -{pct}% OFF
+              <span className="absolute top-3 sm:top-4 left-3 sm:left-4 bg-[#8C3B2E] text-white text-[10px] sm:text-xs font-[Karla] font-bold px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full">
+                -{data?.discount}% OFF
               </span>
-              <TreeRingSeal size={84} />
+              {data?.code && (
+                <span className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-white/90 text-[#2B1D14] text-[10px] sm:text-xs font-[Karla] font-semibold px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full tracking-wide">
+                  {data.code}
+                </span>
+              )}
+              <TreeRingSeal size={72} />
             </>
           }
         />
 
         <div>
-          <p className="font-[Karla] text-xs tracking-[0.2em] uppercase text-[#A8823C]">{data?.cat}</p>
-          <h1 className="font-[Fraunces] text-3xl text-[#2B1D14] mt-2">{data?.name}</h1>
-          <p className="font-[Karla] text-[#8a7860] mt-1">{data?.bn}</p>
-          <div className="flex items-baseline gap-3 mt-5 font-[Karla]">
-            <span className="text-[#A8823C] font-bold text-3xl">৳{data?.price}</span>
-            <span className="text-[#b3a385] text-lg line-through">৳{data?.was}</span>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="font-[Karla] text-xs tracking-[0.2em] uppercase text-[#A8823C]">{data?.cat}</p>
+            {data?.code && (
+              <p className="font-[Karla] text-xs text-[#b3a385] tracking-wide">
+                Product Code: <span className="text-[#4A3627] font-semibold">{data.code}</span>
+              </p>
+            )}
+          </div>
+          <h1 className="font-[Fraunces] text-2xl sm:text-3xl text-[#2B1D14] mt-2 leading-snug">{data?.name}</h1>
+          <p className="font-[Karla] text-[#8a7860] mt-1 text-sm sm:text-base">{data?.bn}</p>
+          <div className="flex flex-wrap items-baseline gap-2 sm:gap-3 mt-4 sm:mt-5 font-[Karla]">
+            <span className="text-[#A8823C] font-bold text-2xl sm:text-3xl">৳{data?.price}</span>
+            <span className="text-[#b3a385] text-base sm:text-lg line-through">৳{data?.was}</span>
+            <span className="text-[#8C3B2E] text-sm font-semibold">-{data?.discount}%</span>
           </div>
           <p className="flex items-center gap-2 mt-3 text-sm font-[Karla] text-[#5B6B4F]">
-            <span className="w-2 h-2 rounded-full bg-[#5B6B4F] inline-block" /> In stock — ready to ship
+            <span className="w-2 h-2 rounded-full bg-[#5B6B4F] inline-block shrink-0" /> In stock — ready to ship
           </p>
 
-          <div className="flex items-center gap-4 mt-7">
-            <div className="flex items-center border border-[#D8C7A8] rounded-full">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mt-6 sm:mt-7">
+            <div className="flex items-center justify-center border border-[#D8C7A8] rounded-full w-fit self-center sm:self-auto">
               <button onClick={() => setQty(Math.max(1, quantity - 1))} className="p-3 text-[#2B1D14]"><Minus className="w-4 h-4" /></button>
               <span className="w-8 text-center font-[Karla] text-[#2B1D14]">{quantity}</span>
               <button onClick={() => setQty(quantity + 1)} className="p-3 text-[#2B1D14]"><Plus className="w-4 h-4" /></button>
@@ -93,7 +105,7 @@ export default function ProductViewPage() {
             Buy Now
           </button>
 
-          <div className="grid grid-cols-2 gap-3 mt-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
             <button
               onClick={handleCall}
               className="flex items-center justify-center gap-2 border border-[#D8C7A8] rounded-full py-2.5 text-sm font-[Karla] text-[#2B1D14]"

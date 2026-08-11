@@ -3,6 +3,9 @@ import { PRODUCTS } from "../data/ProductData";
 import ProductCard from "../products/ProductCard";
 import { Link } from "react-router-dom";
 
+import { Signature } from "../data/SignatureProducts";
+
+
 /* ---------------- Home Page ---------------- */
 export default function HomePage() {
   const search = "";
@@ -10,6 +13,13 @@ export default function HomePage() {
     (p) =>
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.cat.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const search2 = "";
+  const filtered2 = Signature.filter(
+    (p) =>
+      p.name.toLowerCase().includes(search2.toLowerCase()) ||
+      p.cat.toLowerCase().includes(search2.toLowerCase())
   );
 
   return (
@@ -51,10 +61,10 @@ export default function HomePage() {
           
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
-          {filtered.map((p) => (
+          {filtered2.map((p) => (
             <ProductCard data={p} />
           ))}
-          {filtered.length === 0 && (
+          {filtered2.length === 0 && (
             <p className="col-span-full font-[Karla] text-[#8a7860]">No products match "{search}".</p>
           )}
         </div>

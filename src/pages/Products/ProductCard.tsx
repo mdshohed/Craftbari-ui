@@ -10,7 +10,6 @@ import { toast } from "sonner";
 export default function ProductCard({ data }: { data: Product }) {
   // const { id } = useParams();
   // const data: Product = PRODUCTS.find((p) => data?.id === Number(id));
-  const pct = Math.round(((data?.was - data?.price) / data?.was) * 100);
   const hasImage = data?.images && data.images.length > 0;
   const dispatch = useAppDispatch();
   const navigate = useNavigate(); 
@@ -42,13 +41,25 @@ export default function ProductCard({ data }: { data: Product }) {
           )}
         </button>
         <span className="absolute top-3 left-3 bg-[#8C3B2E] text-white text-[11px] font-[Karla] font-bold px-2 py-1 rounded-full">
-          -{pct}%
+          -{data?.discount}%
         </span>
+        {data?.code && (
+          <span className="absolute top-3 right-3 bg-white/90 text-[#2B1D14] text-[10px] font-[Karla] font-semibold px-2 py-1 rounded-full tracking-wide">
+            {data.code}
+          </span>
+        )}
         <TreeRingSeal size={64} />
       </div>
       <div className="p-4">
         <button onClick={()=>handleViewPage(data?.id ?? '')} className="text-left block">
-          <p className="font-[Karla] text-[#8a7860] text-xs">{data?.cat}</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="font-[Karla] text-[#8a7860] text-xs">{data?.cat}</p>
+            {data?.code && (
+              <p className="font-[Karla] text-[#b3a385] text-[10px] tracking-wide">
+                #{data.code}
+              </p>
+            )}
+          </div>
           <h3 className="font-[Fraunces] text-[#2B1D14] text-base leading-snug mt-0.5">{data?.name}</h3>
           <p className="font-[Karla] text-[#8a7860] text-xs mt-0.5">{data?.bn}</p>
         </button>

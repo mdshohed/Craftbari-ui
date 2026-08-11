@@ -36,12 +36,14 @@ export type Page = "home" | "product" | "cart";
 
 export interface Product {
   id: number;
+  code: string;
   name: string;
   bn: string;
   price: number;
   was: number;
   icon: LucideIcon;
   cat: string;
+  discount: number;
   images: string[]; 
   description: string;
   quantity: number;

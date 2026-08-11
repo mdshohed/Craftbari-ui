@@ -345,6 +345,11 @@ export default function CartPage() {
                     )}
                     <div className="flex-1">
                       <h2 className="font-[Fraunces] text-[#2B1D14]">{i.product.name}</h2>
+                      {i?.product?.code && (
+                        <p className="font-[Karla] text-[10px] text-[#b3a385] tracking-wide mt-0.5">
+                          Code: {i.product.code}
+                        </p>
+                      )}
                       <p className="font-[Karla] text-[#A8823C] font-bold mt-1">৳{i.product.price}</p>
                       <div className="flex items-center gap-3 mt-2">
                         <div className="flex items-center border border-[#D8C7A8] rounded-full">
