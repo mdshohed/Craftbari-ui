@@ -7,11 +7,12 @@ import TreeRingSeal from "../shared/TreeRingSeal";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch } from "@/redux/hooks";
 import { addToCart } from "@/redux/features/card/cardSlice";
+import { toast } from "sonner";
 
 /* ---------------- Product Detail Page ---------------- */
 const BUSINESS_PHONE = "+8801869961011";     // used for the "tel:" link — shown in the dialer
 const WHATSAPP_NUMBER = "8801869961011";     // used for wa.me — country code, no + no spaces
- 
+
 function handleCall() {
   window.location.href = `tel:${BUSINESS_PHONE}`;
 }
@@ -24,18 +25,27 @@ function handleWhatsApp(data: Product) {
 export default function ProductViewPage() {
   const { id } = useParams();
   const data: Product = PRODUCTS.find((x) => x.id === Number(id)) || PRODUCTS[0];
-  const [quantity, setQty] = useState<number>(1);
-  useEffect(() => setQty(1), [id]);
+  const minOrder: number = data?.minOrder ?? 1;
+  const [quantity, setQty] = useState<number>(minOrder);
+  useEffect(() => setQty(minOrder), [id]);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
   const handleAddToCart = (product: any) => {
+    if (quantity < minOrder) {
+      toast.error(`এই পণ্যটি কিনতে হলে সর্বনিম্ন ${minOrder} পিস অর্ডার করতে হবে`);
+      return;
+    }
     const payload = { product, quantity };
     dispatch(addToCart(payload));
-    // toast.success("Added to Card Successfully");
-    // setQuantity(1);
+    toast.success("Added to Card Successfully");
   };
 
   const handleBuyNow = (product: any) => {
+    if (quantity < minOrder) {
+      toast.error(`এই পণ্যটি কিনতে হলে সর্বনিম্ন ${minOrder} পিস অর্ডার করতে হবে`);
+      return;
+    }
     const payload = { product, quantity };
     dispatch(addToCart(payload));
     navigate('/cart');
@@ -49,7 +59,6 @@ export default function ProductViewPage() {
         </button>
       </Link>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
-        {/* --- was: <div className="relative rounded-2xl overflow-hidden"> with a single ProductArt --- */}
         <ProductImageGallery
           images={data?.images}
           alt={data?.name}
@@ -84,13 +93,18 @@ export default function ProductViewPage() {
             <span className="text-[#b3a385] text-base sm:text-lg line-through">৳{data?.was}</span>
             <span className="text-[#8C3B2E] text-sm font-semibold">-{data?.discount}%</span>
           </div>
+          {minOrder > 1 && (
+            <p className="mt-2 text-xs font-[Karla] text-[#8C3B2E]">
+              সর্বনিম্ন অর্ডার: {minOrder} পিস
+            </p>
+          )}
           <p className="flex items-center gap-2 mt-3 text-sm font-[Karla] text-[#5B6B4F]">
             <span className="w-2 h-2 rounded-full bg-[#5B6B4F] inline-block shrink-0" /> In stock — ready to ship
           </p>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mt-6 sm:mt-7">
             <div className="flex items-center justify-center border border-[#D8C7A8] rounded-full w-fit self-center sm:self-auto">
-              <button onClick={() => setQty(Math.max(1, quantity - 1))} className="p-3 text-[#2B1D14]"><Minus className="w-4 h-4" /></button>
+              <button onClick={() => setQty(Math.max(minOrder, quantity - 1))} className="p-3 text-[#2B1D14]"><Minus className="w-4 h-4" /></button>
               <span className="w-8 text-center font-[Karla] text-[#2B1D14]">{quantity}</span>
               <button onClick={() => setQty(quantity + 1)} className="p-3 text-[#2B1D14]"><Plus className="w-4 h-4" /></button>
             </div>
@@ -128,7 +142,6 @@ export default function ProductViewPage() {
           </div>
         </div>
       </div>
-      
     </div>
   );
 }

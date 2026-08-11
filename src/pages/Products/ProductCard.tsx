@@ -19,7 +19,15 @@ export default function ProductCard({ data }: { data: Product }) {
   }
 
   const handleAddToCart = (product: any) => {
-    const quantity: number = 1; 
+    const quantity: number = 1;
+    const minOrder: number = product?.minOrder ?? 1;
+
+    // If the product requires a minimum order quantity greater than
+    // what's being added, block it and show a required message.
+    if (quantity < minOrder) {
+      toast.error(`এই পণ্যটি কিনতে হলে সর্বনিম্ন ${minOrder} পিস অর্ডার করতে হবে`);
+      return;
+    }
     const payload = { product, quantity };
     dispatch(addToCart(payload));
     toast.success("Added to Card Successfully");
@@ -55,9 +63,12 @@ export default function ProductCard({ data }: { data: Product }) {
           <div className="flex items-center justify-between gap-2">
             <p className="font-[Karla] text-[#8a7860] text-xs">{data?.cat}</p>
             {data?.code && (
-              <p className="font-[Karla] text-[#b3a385] text-[10px] tracking-wide">
+              <span className="shrink-0 font-[Karla] text-[10px] text-[#8a7860] bg-[#F7F3EA] border border-[#E4D8C4] rounded-full px-2 py-0.5 tracking-wide">
                 #{data.code}
-              </p>
+              </span>
+              // <p className="font-[Karla] text-[#b3a385] text-[10px] tracking-wide">
+              //   #{data.code}
+              // </p>
             )}
           </div>
           <h3 className="font-[Fraunces] text-[#2B1D14] text-base leading-snug mt-0.5">{data?.name}</h3>

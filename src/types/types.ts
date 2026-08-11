@@ -44,6 +44,7 @@ export interface Product {
   icon: LucideIcon;
   cat: string;
   discount: number;
+  minOrder: number;
   images: string[]; 
   description: string;
   quantity: number;
