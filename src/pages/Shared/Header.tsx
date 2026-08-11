@@ -27,9 +27,9 @@ export default function Header() {
       </div>
       <div className="bg-[#FAF6EF]">
         <div className=" max-w-7xl mx-auto border-b border-[#E4D8C4] px-4 sm:px-4 py-3 flex items-center gap-4">
-          <button className="lg:hidden text-[#2B1D14]" onClick={() => setMenuOpen(!menuOpen)}>
+          {/* <button className="lg:hidden text-[#2B1D14]" onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          </button> */}
           <Link to="/">
               <button className="flex items-center gap-2 shrink-0">
               <img

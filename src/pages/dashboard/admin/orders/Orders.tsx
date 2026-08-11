@@ -13,6 +13,7 @@ import OrderCard from "./OrderCard";
 interface IOrderProduct {
   id?: string;
   name?: string;
+  code?: string;             
   price?: number;
   unitPrice?: number;
   quantity?: number;
@@ -44,6 +45,7 @@ interface IOrderRow {
   date?: string;
   amount: number;
   isDelivered: boolean;
+  codes?: string;            
 }
 
 const formatCurrency = (amount: number): string =>
@@ -95,23 +97,27 @@ export default function Orders() {
   const [updateOrder] = useUpdateOrderMutation();
   const [deleteOrder] = useDeleteOrderMutation();
 
-  useEffect(() => {
-    if (orders && orders.data) {
-      const transform: IOrderRow[] = orders.data.map((item: IOrderRecord) => ({
-        id: (item?.id ?? item?._id ?? "") as string,
-        name: item?.name,
-        phone: item?.phoneNumber,
-        address: item?.deliveryAddress,
-        date: item?.createdAt,
-        amount: orderTotal(item), // each row gets its OWN total, not the total of every order
-        isDelivered: !!item?.isDelivered,
-      }));
-      setOrderList(transform);
-    }
-    if (orders?.meta) {
-      setPagination(orders.meta);
-    }
-  }, [orders]);
+ useEffect(() => {
+  if (orders && orders.data) {
+    const transform: IOrderRow[] = orders.data.map((item: IOrderRecord) => ({
+      id: (item?.id ?? item?._id ?? "") as string,
+      name: item?.name,
+      phone: item?.phoneNumber,
+      address: item?.deliveryAddress,
+      date: item?.createdAt,
+      amount: orderTotal(item),
+      isDelivered: !!item?.isDelivered,
+      codes: (item?.orderProducts || [])
+        .map((p) => p.code)
+        .filter(Boolean)
+        .join(", "), // ← added
+    }));
+    setOrderList(transform);
+  }
+  if (orders?.meta) {
+    setPagination(orders.meta);
+  }
+}, [orders]);
 
   const filteredOrders = useMemo(() => {
     if (!searchTerm.trim()) return orderList;
@@ -198,19 +204,25 @@ export default function Orders() {
   };
 
   const columns: TableProps<IOrderRow>["columns"] = [
-    {
-      title: "Order",
-      dataIndex: "id",
-      key: "id",
-      render: (_, record) => (
-        <p className="text-start">#{typeof record.id === "string" ? record.id.slice(0, 8) : ""}</p>
-      ),
-    },
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-    },
+  // {
+  //   title: "Order",
+  //   dataIndex: "id",
+  //   key: "id",
+  //   render: (_, record) => (
+  //     <p className="text-start">#{typeof record.id === "string" ? record.id.slice(0, 8) : ""}</p>
+  //   ),
+  // },
+  {
+    title: "Code",
+    dataIndex: "codes",
+    key: "codes",
+    render: (codes: string) => codes || "—",
+  },
+  {
+    title: "Name",
+    dataIndex: "name",
+    key: "name",
+  },
     {
       title: "Phone",
       dataIndex: "phone",
@@ -272,32 +284,37 @@ export default function Orders() {
   ];
 
   const columns2: TableProps<IOrderProduct>["columns"] = [
-    {
-      title: "Product",
-      dataIndex: "id",
-      key: "id",
-      render: (_, record) => (
-        <p className="text-start">#{typeof record.id === "string" ? record.id.slice(0, 8) : ""}</p>
-      ),
-    },
-    {
-      title: "Name",
-      key: "name",
-      render: (_, record) => record.name,
-    },
-    {
-      title: "Price",
-      key: "price",
-      render: (_, record) => formatCurrency(record.unitPrice ?? record.price ?? 0),
-    },
-    {
-      title: "Quantity",
-      key: "quantity",
-      render: (_, record) => (
-        <p className="text-center">{record.orderQuantity ?? record.quantity ?? "—"}</p>
-      ),
-    },
-  ];
+  // {
+  //   title: "Product",
+  //   dataIndex: "id",
+  //   key: "id",
+  //   render: (_, record) => (
+  //     <p className="text-start">#{typeof record.id === "string" ? record.id.slice(0, 8) : ""}</p>
+  //   ),
+  // },
+  {
+    title: "Code",
+    key: "code",
+    render: (_, record) => record.code || "—",
+  },
+  {
+    title: "Name",
+    key: "name",
+    render: (_, record) => record.name,
+  },
+  {
+    title: "Price",
+    key: "price",
+    render: (_, record) => formatCurrency(record.unitPrice ?? record.price ?? 0),
+  },
+  {
+    title: "Quantity",
+    key: "quantity",
+    render: (_, record) => (
+      <p className="text-center">{record.orderQuantity ?? record.quantity ?? "—"}</p>
+    ),
+  },
+];
 
   const renderOrderList = (data: IOrderRow[]) => {
     if (isMobile) {

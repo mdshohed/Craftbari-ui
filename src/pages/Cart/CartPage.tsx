@@ -120,6 +120,8 @@ export default function CartPage() {
     const orderProduct = products.map((item: any) => ({
       productId: item?.id,
       name: item?.name,
+      code: item?.code,
+      minOrder: item?.minOrder,
       orderQuantity: item?.quantity,
       unitPrice: item?.price,
     }));
