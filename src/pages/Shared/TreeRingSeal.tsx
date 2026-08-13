@@ -8,7 +8,7 @@ interface TreeRingSealProps {
 export default function TreeRingSeal({ size = 78 }: TreeRingSealProps) {
   const id = useId().replace(/:/g, "");
   return (
-    <div className="tree-ring-seal absolute -top-3 -right-3 z-20 drop-shadow-md" style={{ width: size, height: size }}>
+    <div className="tree-ring-seal absolute -top-2 -right-2 z-10 drop-shadow-md" style={{ width: size, height: size }}>
       <svg viewBox="0 0 100 100" width={size} height={size}>
         <circle cx="50" cy="50" r="47" fill="#A8823C" />
         <circle cx="50" cy="50" r="47" fill="none" stroke="#7A5F2E" strokeWidth="1.5" opacity="0.5" />

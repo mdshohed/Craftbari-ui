@@ -52,11 +52,11 @@ export default function ProductCard({ data }: { data: Product }) {
           -{data?.discount}%
         </span>
         {data?.code && (
-          <span className="absolute top-3 right-3 bg-white/90 text-[#2B1D14] text-[10px] font-[Karla] font-semibold px-2 py-1 rounded-full tracking-wide">
+          <span className="absolute top-3 right-3 z-20 bg-white/90 text-[#2B1D14] text-[10px] font-[Karla] font-semibold px-2 py-1 rounded-full tracking-wide">
             {data.code}
           </span>
         )}
-        <TreeRingSeal size={64} />
+        <TreeRingSeal size={48} />
       </div>
       <div className="p-4">
         <button onClick={()=>handleViewPage(data?._id ?? '')} className="text-left block">

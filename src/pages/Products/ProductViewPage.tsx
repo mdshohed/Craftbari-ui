@@ -99,7 +99,7 @@ export default function ProductViewPage() {
                 -{data?.discount}% OFF
               </span>
               {data?.code && (
-                <span className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-white/90 text-[#2B1D14] text-[10px] sm:text-xs font-[Karla] font-semibold px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full tracking-wide">
+                <span className="absolute top-3 z-20 sm:top-4 right-5 sm:right-10 bg-white/90 text-[#2B1D14] text-[10px] sm:text-xs font-[Karla] font-semibold px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full tracking-wide">
                   {data.code}
                 </span>
               )}
