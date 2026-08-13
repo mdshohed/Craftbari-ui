@@ -41,17 +41,16 @@ const productApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["products"],
     }),
-
-    addOrderInfo: builder.mutation({
-      query: (orderInfo) => {
-        return {
-          url: "/order",
-          method: "POST",
-          body: orderInfo,
-        };
-      },
-      invalidatesTags: ["products"],
-    }),
+    // addOrderInfo: builder.mutation({
+    //   query: (orderInfo) => {
+    //     return {
+    //       url: "/order",
+    //       method: "POST",
+    //       body: orderInfo,
+    //     };
+    //   },
+    //   invalidatesTags: ["products"],
+    // }),
   }),
 });
 
@@ -61,5 +60,5 @@ export const {
   useDeleteProductMutation,
   useAddProductMutation,
   useUpdateProductMutation,
-  useAddOrderInfoMutation
+  // useAddOrderInfoMutation
 } = productApi;

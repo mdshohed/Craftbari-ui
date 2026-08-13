@@ -37,7 +37,7 @@ export default function ProductCard({ data }: { data: Product }) {
   return (
     <div className="group relative bg-white rounded-2xl border border-[#E4D8C4] overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all">
       <div className="relative">
-        <button onClick={()=>handleViewPage(data?.id ?? '')} className="block w-full h-64 overflow-hidden">
+        <button onClick={()=>handleViewPage(data?._id ?? '')} className="block w-full h-64 overflow-hidden">
           {hasImage ? (
             <img
               src={data.images[0]}
@@ -59,7 +59,7 @@ export default function ProductCard({ data }: { data: Product }) {
         <TreeRingSeal size={64} />
       </div>
       <div className="p-4">
-        <button onClick={()=>handleViewPage(data?.id ?? '')} className="text-left block">
+        <button onClick={()=>handleViewPage(data?._id ?? '')} className="text-left block">
           <div className="flex items-center justify-between gap-2">
             <p className="font-[Karla] text-[#8a7860] text-xs">{data?.cat}</p>
             {data?.code && (
@@ -107,7 +107,7 @@ export default function ProductCard({ data }: { data: Product }) {
             </button>
 
             <button
-              onClick={() => handleViewPage(data?.id ?? "")}
+              onClick={() => handleViewPage(data?._id ?? "")}
               className="w-full sm:flex-1 bg-[#A8823C] text-white text-sm font-[Karla] font-semibold py-2 rounded-full hover:bg-[#96742f] transition-colors"
             >
               View Details

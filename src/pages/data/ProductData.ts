@@ -9,6 +9,7 @@ import img from '../../assets/images/DeskhOrganizer/Desk-organizer-calender.jpg'
 
 export const PRODUCTS: Product[] = [
   {
+    _id: '',
     id: 8,
     code: "SB-008",
     name: "স্মার্ট মানি সেভিং বক্স",
@@ -45,6 +46,7 @@ export const PRODUCTS: Product[] = [
     📌ভেজা কাপড় বা ভেজা টিস্যু দিয়ে আপনি দাগ মোছতে পারবেন — এবং এগুলো পুনরায় ব্যবহার করা যাবে।`,
   },
   {
+    _id: '',
     id: 11,
     code: "DO-011",
     name: "Desk Organizer with Watch Holder",
@@ -70,6 +72,7 @@ export const PRODUCTS: Product[] = [
     ✅ সারা বাংলাদেশে ক্যাশ অন ডেলিভারি সুবিধা 🚚`,
   },
   {
+    _id: '',
     id: 6,
     code: "SB-006",
     name: "ট্রাভেল মানি সেভিংস ব্যাংক",
@@ -110,6 +113,7 @@ export const PRODUCTS: Product[] = [
     Travel Money Savings Bank – স্বপ্ন এখন হাতের নাগালে। ✈️🌍”`,
   },
   {
+    _id: '',
     id: 4,
     code: "SB-004",
     name: "সঞ্চয় ব্যাংক - ৫০ হাজার টাকা",
@@ -154,6 +158,7 @@ export const PRODUCTS: Product[] = [
     “ভালোই হয়েছে, ওইদিন আমি সঞ্চয় চ্যালেঞ্জটা নিয়েছিলাম!”`,
   },
   {
+    _id: '',
     id: 9,
     code: "DO-009",
     name: "Desk Organizer with Home Holder",
@@ -179,6 +184,7 @@ export const PRODUCTS: Product[] = [
     ✅ সারা বাংলাদেশে ক্যাশ অন ডেলিভারি সুবিধা 🚚`,
   },
   {
+    _id: '',
     id: 12,
     code: "DO-012",
     name: "Desk Organizer with Calender Holder",
@@ -204,6 +210,7 @@ export const PRODUCTS: Product[] = [
     ✅ সারা বাংলাদেশে ক্যাশ অন ডেলিভারি সুবিধা 🚚`,
   },
   {
+    _id: '',
     id: 15,
     code: "HL-015",
     name: "New year calender",
@@ -233,6 +240,7 @@ export const PRODUCTS: Product[] = [
     ✅ সারা বাংলাদেশে ক্যাশ অন ডেলিভারি সুবিধা 🚚`,
   },
   {
+    _id: '',
     id: 7,
     code: "HW-007",
     name: "স্মার্ট মেডিসিন অর্গানাইজার বক্স",
@@ -272,6 +280,7 @@ export const PRODUCTS: Product[] = [
     👉 আজই সংগ্রহ করুন, প্রিয়জনকে দিন সুস্থ ও নিশ্চিন্ত জীবনের উপহার ❤️`,
   },
   {
+    _id: '',
     id: 14,
     code: "AC-014",
     name: "চাবির কড়া",
@@ -298,6 +307,7 @@ export const PRODUCTS: Product[] = [
     ✅ সারা বাংলাদেশে ক্যাশ অন ডেলিভারি সুবিধা 🚚`,
   },
   {
+    _id: '',
     id: 5,
     code: "DO-005",
     name: "ক্লাসিক কাঠের কলমদানি",
@@ -328,6 +338,7 @@ export const PRODUCTS: Product[] = [
     ✨ সুন্দর ডিজাইন ও প্রিমিয়াম ফিনিশ আপনার ডেস্ককে করবে আরও আকর্ষণীয়`,
   },
   {
+    _id: '',
     id: 3,
     code: "SB-003",
     name: "উমরাহ ব্যাংক - ১ লক্ষ ৫০ হাজার টাকা",
@@ -373,6 +384,7 @@ export const PRODUCTS: Product[] = [
 
   },
   {
+    _id: '',
     id: 1,
     code: "WC-001",
     name: "আয়াতুল কুরসি ডিজাইনের কাঠের দেয়াল ঘড়ি",
@@ -402,6 +414,7 @@ export const PRODUCTS: Product[] = [
     আপনার বাসা, অফিস, দোকান বা গিফট আইটেমের জন্য পারফেক্ট একটি পছন্দ।`,
   },
   {
+    _id: '',
     id: 10,
     code: "DO-010",
     name: "Desk Organizer with Card Holder",
@@ -427,6 +440,7 @@ export const PRODUCTS: Product[] = [
     ✅ সারা বাংলাদেশে ক্যাশ অন ডেলিভারি সুবিধা 🚚`,
   },
   {
+    _id: '',
     id: 13,
     code: "DO-013",
     name: "Desk Organizer with Pen Holder",
@@ -452,6 +466,7 @@ export const PRODUCTS: Product[] = [
     ✅ সারা বাংলাদেশে ক্যাশ অন ডেলিভারি সুবিধা 🚚`,
   },
   {
+    _id: '',
     id: 2,
     code: "DO-002",
     name: "Natural Wood Desk Organizer Set",

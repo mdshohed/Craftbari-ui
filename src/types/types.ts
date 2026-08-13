@@ -1,7 +1,23 @@
 import { LucideIcon } from "lucide-react";
 import { ReactNode } from "react";
 
+export interface TProduct2 {
+  id?: string;
+  name?: string;
+  description?: string;
+  category?: string;
+  brand?: string;
+  stockQuantity?: number;
+  rating?: number; 
+  productDescription?: string;
+  price?: number;
+  image?: string;
+  isAvailable?: boolean;
+  __v?: number; 
+}
+
 export interface TProduct {
+  _id?: string;
   id?: string;
   name?: string;
   description?: string;
@@ -34,7 +50,25 @@ export type TUser = {
 /* ---------------- Types ---------------- */
 export type Page = "home" | "product" | "cart";
 
+export interface Product2 {
+
+  id: number;
+  code: string;
+  name: string;
+  bn: string;
+  price: number;
+  was: number;
+  icon: LucideIcon;
+  cat: string;
+  discount: number;
+  minOrder: number;
+  images: string[]; 
+  description: string;
+  quantity: number;
+}
+
 export interface Product {
+  _id: string;
   id: number;
   code: string;
   name: string;

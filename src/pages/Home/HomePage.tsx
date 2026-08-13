@@ -1,26 +1,67 @@
 import { ChevronRight } from "lucide-react";
-import { PRODUCTS } from "../data/ProductData";
 import ProductCard from "../products/ProductCard";
 import { Link } from "react-router-dom";
+import { Product } from "@/types/types";
+import { useGetAllProductsQuery } from "@/redux/features/products/productApi";
 
-import { Signature } from "../data/SignatureProducts";
+/* ---------------- Skeleton Card ---------------- */
+function ProductCardSkeleton() {
+  return (
+    <div className="rounded-2xl overflow-hidden border border-[#E4D8C4] bg-white animate-pulse">
+      <div className="aspect-square bg-[#EDE3D0] blur-[2px]" />
+      <div className="p-4 space-y-2">
+        <div className="h-3 w-1/3 bg-[#EDE3D0] rounded blur-[1px]" />
+        <div className="h-4 w-3/4 bg-[#EDE3D0] rounded blur-[1px]" />
+        <div className="h-4 w-1/2 bg-[#EDE3D0] rounded blur-[1px]" />
+      </div>
+    </div>
+  );
+}
 
+function ProductGridSkeleton({ count = 8 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
+      {Array.from({ length: count }).map((_, i) => (
+        <ProductCardSkeleton key={i} />
+      ))}
+    </div>
+  );
+}
 
 /* ---------------- Home Page ---------------- */
 export default function HomePage() {
+  const { data: response, isLoading, isError } = useGetAllProductsQuery(undefined);
+
+  // Adjust depending on your actual API response shape.
+  // e.g. if backend returns { data: [...] }, use response?.data
+  const products: Product[] = response?.data ?? response ?? [];
+
   const search = "";
-  const filtered = PRODUCTS.filter(
+  const filtered = products.filter(
     (p) =>
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.cat.toLowerCase().includes(search.toLowerCase())
   );
 
   const search2 = "";
-  const filtered2 = Signature.filter(
-    (p) =>
-      p.name.toLowerCase().includes(search2.toLowerCase()) ||
-      p.cat.toLowerCase().includes(search2.toLowerCase())
-  );
+  // NOTE: assuming "Signature Blends" is a subset of the same product list,
+  // flagged by e.g. p.isSignature or p.cat === "Signature".
+  // Swap this line for whatever field your backend actually uses.
+  const filtered2 = products
+    .filter((p) => (p as any).isSignature)
+    .filter(
+      (p) =>
+        p.name.toLowerCase().includes(search2.toLowerCase()) ||
+        p.cat.toLowerCase().includes(search2.toLowerCase())
+    );
+
+  if (isError) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-10 py-10 text-center font-[Karla] text-red-500">
+        Failed to load products. Please try again.
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -36,17 +77,22 @@ export default function HomePage() {
               View all <ChevronRight className="w-4 h-4" />
             </span>
           </Link>
-          
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
-          {filtered.map((p) => (
-            <ProductCard data={p}  />
-          ))}
-          {filtered.length === 0 && (
-            <p className="col-span-full font-[Karla] text-[#8a7860]">No products match "{search}".</p>
-          )}
-        </div>
+
+        {isLoading ? (
+          <ProductGridSkeleton count={8} />
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
+            {filtered.map((p) => (
+              <ProductCard key={p._id ?? p.id} data={p} />
+            ))}
+            {filtered.length === 0 && (
+              <p className="col-span-full font-[Karla] text-[#8a7860]">No products match "{search}".</p>
+            )}
+          </div>
+        )}
       </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-10 py-10">
         <div className="flex items-end justify-between mb-7">
           <div>
@@ -58,16 +104,20 @@ export default function HomePage() {
               View all <ChevronRight className="w-4 h-4" />
             </span>
           </Link>
-          
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
-          {filtered2.map((p) => (
-            <ProductCard data={p} />
-          ))}
-          {filtered2.length === 0 && (
-            <p className="col-span-full font-[Karla] text-[#8a7860]">No products match "{search}".</p>
-          )}
-        </div>
+
+        {isLoading ? (
+          <ProductGridSkeleton count={4} />
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
+            {filtered2.map((p) => (
+              <ProductCard key={p._id ?? p.id} data={p} />
+            ))}
+            {filtered2.length === 0 && (
+              <p className="col-span-full font-[Karla] text-[#8a7860]">No products match "{search2}".</p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

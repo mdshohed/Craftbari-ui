@@ -1,5 +1,4 @@
 import { Product } from "@/types/types";
-import { PRODUCTS } from "../data/ProductData";
 import { useEffect, useState } from "react";
 import { ChevronLeft, MessageCircle, Minus, Phone, Plus, ShoppingBag } from "lucide-react";
 import ProductImageGallery from "./ProductImageGallery";
@@ -8,6 +7,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch } from "@/redux/hooks";
 import { addToCart } from "@/redux/features/card/cardSlice";
 import { toast } from "sonner";
+import { useGetSingleProductQuery } from "@/redux/features/products/productApi";
 
 /* ---------------- Product Detail Page ---------------- */
 const BUSINESS_PHONE = "+8801869961011";     // used for the "tel:" link — shown in the dialer
@@ -24,14 +24,24 @@ function handleWhatsApp(data: Product) {
 
 export default function ProductViewPage() {
   const { id } = useParams();
-  const data: Product = PRODUCTS.find((x) => x.id === Number(id)) || PRODUCTS[0];
+
+  const { data: response, isLoading, isError } = useGetSingleProductQuery(id, {
+    skip: !id,
+  });
+
+  // Adjust depending on your actual API response shape.
+  // e.g. if backend returns { data: {...} }, use response?.data
+  const data: Product | undefined = response?.data ?? response;
+
   const minOrder: number = data?.minOrder ?? 1;
   const [quantity, setQty] = useState<number>(minOrder);
-  useEffect(() => setQty(minOrder), [id]);
+
+  useEffect(() => setQty(minOrder), [minOrder, id]);
+
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const handleAddToCart = (product: any) => {
+  const handleAddToCart = (product: Product) => {
     if (quantity < minOrder) {
       toast.error(`এই পণ্যটি কিনতে হলে সর্বনিম্ন ${minOrder} পিস অর্ডার করতে হবে`);
       return;
@@ -41,15 +51,36 @@ export default function ProductViewPage() {
     toast.success("Added to Card Successfully");
   };
 
-  const handleBuyNow = (product: any) => {
+  const handleBuyNow = (product: Product) => {
     if (quantity < minOrder) {
       toast.error(`এই পণ্যটি কিনতে হলে সর্বনিম্ন ${minOrder} পিস অর্ডার করতে হবে`);
       return;
     }
     const payload = { product, quantity };
     dispatch(addToCart(payload));
-    navigate('/cart');
+    navigate("/cart");
   };
+
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-10 text-center font-[Karla] text-[#8a7860]">
+        Loading product...
+      </div>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-10 text-center font-[Karla]">
+        <p className="text-red-500 mb-4">Product not found or failed to load.</p>
+        <Link to="/">
+          <button className="flex items-center gap-1 text-sm font-[Karla] text-[#8a7860] hover:text-[#2B1D14] mx-auto">
+            <ChevronLeft className="w-4 h-4" /> Back to shop
+          </button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-10">

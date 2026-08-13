@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { Link, useNavigate } from "react-router-dom";
 import { clearCart, deleteFromCard, updateQuantity } from "@/redux/features/card/cardSlice";
 import { toast } from "sonner";
-import { useAddOrderInfoMutation } from "@/redux/features/products/productApi";
+import { useAddOrderInfoMutation } from "@/redux/features/orders/orderApi";
 
 
 /* ---------------- Cart Page ---------------- */
