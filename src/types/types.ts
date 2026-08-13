@@ -85,12 +85,12 @@ export interface Product {
 }
 
 export interface CartItem {
-  id: number;
+  _id: string;
   quantity: number;
 }
 
 export interface CartItem2 {
-  id: number;
+  _id: string;
   name: string;
   price: number;
   quantity: number;

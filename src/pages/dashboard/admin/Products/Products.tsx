@@ -2,6 +2,8 @@ import { useMemo, useRef, useState, useEffect } from "react";
 import {
   ArrowLeft,
   CalendarDays,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   Key,
   LayoutGrid,
@@ -77,6 +79,20 @@ function unwrapItem(res: any): ApiProduct | null {
   return res;
 }
 
+/* ---------------- Pagination meta shape ---------------- */
+interface ListMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPage: number;
+}
+
+function unwrapMeta(res: any): ListMeta {
+  return (
+    res?.meta ?? { page: 1, limit: 10, total: 0, totalPage: 1 }
+  );
+}
+
 /* ---------------- Edit form shape ---------------- */
 interface EditForm {
   _id: string;
@@ -122,18 +138,41 @@ export default function ProductManagementPage() {
   const [query, setQuery] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
 
+  /* ---------- pagination state ---------- */
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+
+  // debounce the search box so we don't refetch on every keystroke
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQuery(query.trim()), 400);
+    return () => clearTimeout(t);
+  }, [query]);
+
+  // reset to page 1 whenever the (debounced) search term changes
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedQuery]);
+
   /* ---------- data fetching ---------- */
   const {
     data: listRes,
     isLoading: listLoading,
+    isFetching: listFetching,
     isError: listError,
     refetch: refetchList,
-  } = useGetAllProductsQuery(undefined);
+  } = useGetAllProductsQuery({
+    page,
+    limit,
+    searchTerm: debouncedQuery || undefined,
+  });
 
   const products: Product[] = useMemo(
     () => unwrapList(listRes).map(mapApiToProduct),
     [listRes]
   );
+
+  const meta = useMemo(() => unwrapMeta(listRes), [listRes]);
 
   const { data: singleRes, isLoading: singleLoading } = useGetSingleProductQuery(
     activeId as string,
@@ -149,17 +188,9 @@ export default function ProductManagementPage() {
   const [updateProduct, { isLoading: updating }] = useUpdateProductMutation();
   const [deleteProduct, { isLoading: deleting }] = useDeleteProductMutation();
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return products;
-    return products.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.bn?.toLowerCase().includes(q) ||
-        p.code?.toLowerCase().includes(q) ||
-        p.cat?.toLowerCase().includes(q)
-    );
-  }, [products, query]);
+  // search is now done server-side (searchTerm param), so `products`
+  // returned from the API is already the filtered + paginated page
+  const filtered = products;
 
   /* ---------- navigation helpers ---------- */
   const goList = () => {
@@ -175,6 +206,9 @@ export default function ProductManagementPage() {
     setActiveId(p._id);
     setMode("edit");
   };
+
+  const goPrevPage = () => setPage((p) => Math.max(1, p - 1));
+  const goNextPage = () => setPage((p) => Math.min(meta.totalPage, p + 1));
 
   return (
     <div className="px-3 sm:px-0">
@@ -197,7 +231,7 @@ export default function ProductManagementPage() {
             {mode === "edit" && "Edit Product"}
           </h6>
           <p className="text-sm text-[#8a7860] mt-1">
-            {mode === "list" && `${products.length} products in your catalogue`}
+            {mode === "list" && `${meta.total} products in your catalogue`}
             {mode === "view" && activeProduct?.code}
             {(mode === "add" || mode === "edit") &&
               "Fill in the details below — required fields are marked *"}
@@ -255,84 +289,131 @@ export default function ProductManagementPage() {
               <p className="text-[#8a7860]">No products match your search.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-2xl border border-[#E4D8C4] bg-white">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-[#F7F3EA] text-left text-[#8a7860] text-xs uppercase tracking-wide">
-                    <th className="px-4 py-3">Product</th>
-                    <th className="px-4 py-3">Code</th>
-                    <th className="px-4 py-3">Category</th>
-                    <th className="px-4 py-3">Price</th>
-                    <th className="px-4 py-3">Discount</th>
-                    <th className="px-4 py-3">Min. Order</th>
-                    <th className="px-4 py-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((p) => {
-                    const Icon = p.icon;
-                    return (
-                      <tr key={p.id} className="border-t border-[#E4D8C4] hover:bg-[#FAF6EF]">
-                        <td className="px-4 py-3">
-                          <button
-                            onClick={() => goView(p)}
-                            className="flex items-center gap-3 text-left"
-                          >
-                            {p.images?.[0] ? (
-                              <img
-                                src={p.images[0]}
-                                alt={p.name}
-                                className="w-11 h-11 rounded-lg object-cover shrink-0 border border-[#E4D8C4]"
-                              />
-                            ) : (
-                              <span className="w-11 h-11 rounded-lg bg-[#F7F3EA] flex items-center justify-center shrink-0 border border-[#E4D8C4]">
-                                {Icon && <Icon className="w-5 h-5 text-[#A8823C]" />}
+            <>
+              <div className="overflow-x-auto rounded-2xl border border-[#E4D8C4] bg-white">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-[#F7F3EA] text-left text-[#8a7860] text-xs uppercase tracking-wide">
+                      <th className="px-4 py-3">Product</th>
+                      <th className="px-4 py-3">Code</th>
+                      <th className="px-4 py-3">Category</th>
+                      <th className="px-4 py-3">Price</th>
+                      <th className="px-4 py-3">Discount</th>
+                      <th className="px-4 py-3">Min. Order</th>
+                      <th className="px-4 py-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map((p) => {
+                      const Icon = p.icon;
+                      return (
+                        <tr key={p.id} className="border-t border-[#E4D8C4] hover:bg-[#FAF6EF]">
+                          <td className="px-4 py-3">
+                            <button
+                              onClick={() => goView(p)}
+                              className="flex items-center gap-3 text-left"
+                            >
+                              {p.images?.[0] ? (
+                                <img
+                                  src={p.images[0]}
+                                  alt={p.name}
+                                  className="w-11 h-11 rounded-lg object-cover shrink-0 border border-[#E4D8C4]"
+                                />
+                              ) : (
+                                <span className="w-11 h-11 rounded-lg bg-[#F7F3EA] flex items-center justify-center shrink-0 border border-[#E4D8C4]">
+                                  {Icon && <Icon className="w-5 h-5 text-[#A8823C]" />}
+                                </span>
+                              )}
+                              <span>
+                                <span className="block font-[Fraunces] text-[#2B1D14] leading-snug">
+                                  {p.name}
+                                </span>
+                                <span className="block text-xs text-[#8a7860]">{p.bn}</span>
                               </span>
-                            )}
-                            <span>
-                              <span className="block font-[Fraunces] text-[#2B1D14] leading-snug">
-                                {p.name}
-                              </span>
-                              <span className="block text-xs text-[#8a7860]">{p.bn}</span>
+                            </button>
+                          </td>
+                          <td className="px-4 py-3 text-[#8a7860]">{p.code}</td>
+                          <td className="px-4 py-3 text-[#8a7860]">{p.cat}</td>
+                          <td className="px-4 py-3">
+                            <span className="text-[#A8823C] font-bold">৳{p.price}</span>
+                            <span className="text-[#b3a385] text-xs line-through ml-1">
+                              ৳{p.was}
                             </span>
-                          </button>
-                        </td>
-                        <td className="px-4 py-3 text-[#8a7860]">{p.code}</td>
-                        <td className="px-4 py-3 text-[#8a7860]">{p.cat}</td>
-                        <td className="px-4 py-3">
-                          <span className="text-[#A8823C] font-bold">৳{p.price}</span>
-                          <span className="text-[#b3a385] text-xs line-through ml-1">
-                            ৳{p.was}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-[#8C3B2E] font-semibold">
-                          -{p.discount ?? calcDiscount(p.price, p.was)}%
-                        </td>
-                        <td className="px-4 py-3 text-[#8a7860]">{p.minOrder ?? 1}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center justify-end gap-2">
-                            <button
-                              onClick={() => goEdit(p)}
-                              className="p-2 rounded-full border border-[#D8C7A8] text-[#2B1D14] hover:bg-[#F7F3EA]"
-                              title="Edit"
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => setDeleteTarget(p)}
-                              className="p-2 rounded-full border border-[#E4B7A8] text-[#8C3B2E] hover:bg-[#FBEEE9]"
-                              title="Delete"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                          </td>
+                          <td className="px-4 py-3 text-[#8C3B2E] font-semibold">
+                            -{p.discount ?? calcDiscount(p.price, p.was)}%
+                          </td>
+                          <td className="px-4 py-3 text-[#8a7860]">{p.minOrder ?? 1}</td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => goEdit(p)}
+                                className="p-2 rounded-full border border-[#D8C7A8] text-[#2B1D14] hover:bg-[#F7F3EA]"
+                                title="Edit"
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => setDeleteTarget(p)}
+                                className="p-2 rounded-full border border-[#E4B7A8] text-[#8C3B2E] hover:bg-[#FBEEE9]"
+                                title="Delete"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* ---------------- PAGINATION ---------------- */}
+              {meta.totalPage > 1 && (
+                <div className="flex items-center justify-between mt-5 flex-wrap gap-3">
+                  <p className="text-sm text-[#8a7860]">
+                    Page <span className="font-semibold text-[#2B1D14]">{meta.page}</span> of{" "}
+                    <span className="font-semibold text-[#2B1D14]">{meta.totalPage}</span>{" "}
+                    &middot; {meta.total} total products
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={goPrevPage}
+                      disabled={page <= 1 || listFetching}
+                      className="flex items-center gap-1 border border-[#D8C7A8] text-[#2B1D14] font-semibold px-4 py-2 rounded-full hover:bg-[#F7F3EA] disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <ChevronLeft className="w-4 h-4" /> Prev
+                    </button>
+
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: meta.totalPage }, (_, i) => i + 1).map((n) => (
+                        <button
+                          key={n}
+                          onClick={() => setPage(n)}
+                          disabled={listFetching}
+                          className={`w-9 h-9 rounded-full text-sm font-semibold transition-colors ${
+                            n === meta.page
+                              ? "bg-[#2B1D14] text-white"
+                              : "text-[#2B1D14] hover:bg-[#F7F3EA]"
+                          }`}
+                        >
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      onClick={goNextPage}
+                      disabled={page >= meta.totalPage || listFetching}
+                      className="flex items-center gap-1 border border-[#D8C7A8] text-[#2B1D14] font-semibold px-4 py-2 rounded-full hover:bg-[#F7F3EA] disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Next <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}

@@ -2,7 +2,6 @@ import { ChangeEvent, useState } from "react";
 import ProductArt from "../home/ProductArt";
 import { Check, Lock, Minus, Plus, RotateCcw, Shield, ShoppingBag, Truck } from "lucide-react";
 import { CartItem2, CartItemWithProduct, FieldProps, FormErrors, PaymentMethod, Product, Step } from "@/types/types";
-import { PRODUCTS } from "../data/ProductData";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { Link, useNavigate } from "react-router-dom";
 import { clearCart, deleteFromCard, updateQuantity } from "@/redux/features/card/cardSlice";
@@ -61,15 +60,17 @@ export default function CartPage() {
   });
   const [addOrderInfo, { isError }] = useAddOrderInfoMutation();
 
-  const items: CartItemWithProduct[] = products.map((c: CartItem2) => ({
-    ...c,
-    product: PRODUCTS.find((p) => p.id === c.id) as Product,
-  }));
-  const total = items.reduce((s, i) => s + i.product.price * i.quantity, 0);
+  console.log({products})
+  // const items: CartItemWithProduct[] = products.map((c: CartItem2) => ({
+  //   ...c,
+  //   product: PRODUCTS.find((p) => p._id === c._id) as Product,
+  // }));
+  // console.log({items})
+  const total = products.reduce((s: number, i: Product) => s + i.price * i.quantity, 0);
   const dispatch = useAppDispatch();
 
-  const handleQuantity = (type: string, id: number) => {
-    const payload = { type, id };
+  const handleQuantity = (type: string, _id: string) => {
+    const payload = { type, _id };
     if (type == "increment") {
       // const foundProduct = products.find((product: any) => product.id === id);
       // const cardQuantity = foundProduct ? foundProduct.quantity : 0;
@@ -84,8 +85,8 @@ export default function CartPage() {
     }
   };
 
-  const handleRemove = (id: number) => {
-    const payload = { id };
+  const handleRemove = (_id: string) => {
+    const payload = { _id };
     dispatch(deleteFromCard(payload));
   };
 
@@ -118,7 +119,7 @@ export default function CartPage() {
     if (!validate() ) return;
     
     const orderProduct = products.map((item: any) => ({
-      productId: item?.id,
+      productId: item?._id,
       name: item?.name,
       code: item?.code,
       minOrder: item?.minOrder,
@@ -152,7 +153,7 @@ export default function CartPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-2 py-6">
       {/* <h1 className="font-[Fraunces] text-3xl text-[#2B1D14] mb-8">Your Cart</h1> */}
-      {items.length === 0 ? (
+      {products.length === 0 ? (
         <div className="text-center py-16">
           <ShoppingBag className="w-10 h-10 mx-auto text-[#D8C7A8]" />
           <p className="font-[Karla] text-[#8a7860] mt-4">Your cart is empty.</p>
@@ -333,42 +334,42 @@ export default function CartPage() {
               <h2 className="mb-4 text-base font-semibold text-stone-900">Order Summary</h2>
               <div className="border-t border-stone-100" />
               <div className="md:col-span-2 space-y-4 pb-4">
-                {items.map((i) => (
-                  <div key={i.id} className="flex gap-4 bg-white border border-[#E4D8C4] rounded-2xl p-3">
+                {products.map((i: any) => (
+                  <div key={i._id} className="flex gap-4 bg-white border border-[#E4D8C4] rounded-2xl p-3">
                     {/* <ProductArt Icon={i.product.icon} className="w-20 h-20 rounded-xl shrink-0" /> */}
-                    {i?.product?.images ? (
+                    {i?.images?.length ? (
                       <img
-                        src={i.product.images[0]}
-                        alt={i.product.name}
+                        src={i.images[0]}
+                        alt={i.name}
                         className="w-20 h-20 rounded-xl shrink-0 group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
-                      <ProductArt Icon={i.product.icon} className="w-20 h-20 rounded-xl shrink-0" />
+                      <ProductArt Icon={i.icon} className="w-20 h-20 rounded-xl shrink-0" />
                     )}
                     <div className="flex-1">
-                      <h2 className="font-[Fraunces] text-[#2B1D14]">{i.product.name}</h2>
-                      {i?.product?.code && (
+                      <h2 className="font-[Fraunces] text-[#2B1D14]">{i.name}</h2>
+                      {i?.code && (
                         <p className="font-[Karla] text-[10px] text-[#b3a385] tracking-wide mt-0.5">
-                          Code: {i.product.code}
+                          Code: {i.code}
                         </p>
                       )}
-                      <p className="font-[Karla] text-[#A8823C] font-bold mt-1">৳{i.product.price}</p>
+                      <p className="font-[Karla] text-[#A8823C] font-bold mt-1">৳{i.price}</p>
                       <div className="flex items-center gap-3 mt-2">
                         <div className="flex items-center border border-[#D8C7A8] rounded-full">
                           <button 
                             onClick={() =>
-                              handleQuantity("decrement", i.id)
+                              handleQuantity("decrement", i._id)
                             }
                             className="p-1.5 text-[#2B1D14]"><Minus className="w-3.5 h-3.5" /></button>
                           <span className="w-6 text-center text-sm font-[Karla]">{i.quantity}</span>
                           <button 
                             onClick={() =>
-                              handleQuantity("increment", i.id)
+                              handleQuantity("increment", i._id)
                             }                           
                             className="p-1.5 text-[#2B1D14]"><Plus className="w-3.5 h-3.5" /></button>
                         </div>
                         <button 
-                        onClick={() => handleRemove(i.id)} 
+                        onClick={() => handleRemove(i._id)} 
                         className="text-xs font-[Karla] text-[#8C3B2E] hover:underline">Remove</button>
                       </div>
                     </div>

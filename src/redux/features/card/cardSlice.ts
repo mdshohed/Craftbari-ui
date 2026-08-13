@@ -24,7 +24,7 @@ export const cartSlice = createSlice({
   reducers: {
     addToCart: (state, action) => { 
       const isExist = state.products.find(
-        (product: any) => product.id === action.payload.product.id
+        (product: any) => product._id === action.payload.product._id
       );
 
       if (!isExist) {
@@ -32,7 +32,7 @@ export const cartSlice = createSlice({
       }
       else{
         state.products = state.products.map((product: any) => 
-          product.id === action.payload.product.id
+          product._id === action.payload.product._id
             ? { ...product, quantity: action.payload.quantity + product.quantity }
             : product
         );
@@ -45,7 +45,7 @@ export const cartSlice = createSlice({
 
     updateQuantity: (state: any, action) => {
       state.products.map((product: any) => {
-        if (product.id === action.payload.id) {
+        if (product._id === action.payload._id) {
           if (action.payload.type === "increment") {
             product.quantity += 1;
           } else if (action.payload.type === "decrement" && product.quantity>1) {
@@ -66,7 +66,7 @@ export const cartSlice = createSlice({
     },
 
     deleteFromCard: (state, action) => { 
-      state.products = state.products.filter( (product:any)=> product.id !== action.payload.id);
+      state.products = state.products.filter( (product:any)=> product._id !== action.payload._id);
       state.selectedItems = selectSelectedItems(state);
       state.totalPrice = selectTotalPrice(state);
       state.vat = selectVat(state);

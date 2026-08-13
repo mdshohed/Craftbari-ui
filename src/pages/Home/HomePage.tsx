@@ -44,16 +44,20 @@ export default function HomePage() {
   );
 
   const search2 = "";
-  // NOTE: assuming "Signature Blends" is a subset of the same product list,
-  // flagged by e.g. p.isSignature or p.cat === "Signature".
-  // Swap this line for whatever field your backend actually uses.
-  const filtered2 = products
-    .filter((p) => (p as any).isSignature)
-    .filter(
-      (p) =>
-        p.name.toLowerCase().includes(search2.toLowerCase()) ||
-        p.cat.toLowerCase().includes(search2.toLowerCase())
-    );
+  // Fisher-Yates shuffle — doesn't mutate the original array
+  function shuffleArray<T>(arr: T[]): T[] {
+    const result = [...arr];
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
+  }
+    const filtered2 = shuffleArray(products).filter(
+    (p) =>
+      p.name.toLowerCase().includes(search2.toLowerCase()) ||
+      p.cat.toLowerCase().includes(search2.toLowerCase())
+  );
 
   if (isError) {
     return (
