@@ -14,12 +14,19 @@ const BUSINESS_PHONE = "+8801869961011";     // used for the "tel:" link — sho
 const WHATSAPP_NUMBER = "8801869961011";     // used for wa.me — country code, no + no spaces
 
 function handleCall() {
+  if (window.fbq) {
+    window.fbq('track', 'Contact', { method: 'Call' });
+  }
   window.location.href = `tel:${BUSINESS_PHONE}`;
 }
+
 function handleWhatsApp(data: Product) {
   const message = `আসসালামু আলাইকুম, আমি এই পণ্যটি অর্ডার করতে চাই:\n\n${data?.name}\nমূল্য: ৳${data?.price}\nলিংক: ${window.location.href}`;
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
   window.open(url, "_blank");
+  if (window.fbq) {
+    window.fbq('track', 'Contact', { method: 'WhatsApp' });
+  }
 }
 
 export default function ProductViewPage() {
@@ -46,6 +53,17 @@ export default function ProductViewPage() {
       toast.error(`এই পণ্যটি কিনতে হলে সর্বনিম্ন ${minOrder} পিস অর্ডার করতে হবে`);
       return;
     }
+
+    if (window.fbq) {
+      window.fbq('track', 'AddToCart', {
+        content_name: product.code,
+        content_ids: [product.code],
+        content_type: 'product',
+        value: product.price,
+        currency: 'BDT',
+      });
+    }
+
     const payload = { product, quantity };
     dispatch(addToCart(payload));
     toast.success("Added to Card Successfully");
@@ -56,6 +74,16 @@ export default function ProductViewPage() {
       toast.error(`এই পণ্যটি কিনতে হলে সর্বনিম্ন ${minOrder} পিস অর্ডার করতে হবে`);
       return;
     }
+    if (window.fbq) {
+      window.fbq('track', 'InitiateCheckout', {
+        content_name: product.code,
+        content_ids: [product.code],
+        content_type: 'product',
+        value: product.price,
+        currency: 'BDT',
+      });
+    }
+
     const payload = { product, quantity };
     dispatch(addToCart(payload));
     navigate("/cart");

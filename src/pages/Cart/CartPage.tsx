@@ -110,14 +110,8 @@ export default function CartPage() {
   // };
 
   const handlePlaceOrder = async () => {
-    // (Object.keys(deliveryDetails) as (keyof DeliveryDetails)[]).forEach((key) => {
-    //   if (deliveryDetails[key] === '') {
-    //     toast.warning(`${key} field is empty`);
-    //     if (!validate() ) return;
-    //   }
-    // })
-    if (!validate() ) return;
-    
+    if (!validate()) return;
+
     const orderProduct = products.map((item: any) => ({
       productId: item?._id,
       name: item?.name,
@@ -132,21 +126,35 @@ export default function CartPage() {
       deliveryAddress: deliveryDetails.deliveryAddress,
       notes: deliveryDetails.notes,
       orderProducts: orderProduct,
-      isDelivered: false
+      isDelivered: false,
     };
     const res = await addOrderInfo(orderData).unwrap();
-    // if (res.statusCode === 200 && res.success) {
-    if ( res.success) {
-      setPlacing(true)
+
+    if (res.success) {
+      if (window.fbq) {
+        window.fbq('track', 'Purchase', {
+          value: total,
+          currency: 'BDT',
+          content_ids: products.map((item: any) => item?.code),
+          content_type: 'product',
+          contents: products.map((item: any) => ({
+            id: item?.code,
+            quantity: item?.quantity,
+            item_price: item?.price,
+          })),
+          num_items: products.reduce((sum: number, item: any) => sum + (item?.quantity ?? 0), 0),
+        });
+      }
+
+      setPlacing(true);
       setTimeout(() => {
         setPlacing(false);
         dispatch(clearCart());
         navigate("/checkout/success");
-         toast.success(`Order Created Successfully`);
+        toast.success(`Order Created Successfully`);
       }, 1000);
-    }
-    else {
-      console.log(isError)
+    } else {
+      console.log(isError);
     }
   };
 

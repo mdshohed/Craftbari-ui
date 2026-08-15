@@ -22,6 +22,17 @@ export default function ProductCard({ data }: { data: Product }) {
     const quantity: number = 1;
     const minOrder: number = product?.minOrder ?? 1;
 
+    if(window.fbq){
+      window.fbq('track', 'InitiateCheckout', {
+        content_name: product.code,
+        content_ids: [product.code],
+        content_type: 'product',
+        value: product.price,
+        currency: 'BDT',
+      });
+    }
+   
+
     // If the product requires a minimum order quantity greater than
     // what's being added, block it and show a required message.
     if (quantity < minOrder) {

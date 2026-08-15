@@ -1,12 +1,13 @@
 
+import { usePageViewTracking } from "@/hooks/usePageViewTracking";
 import Footer from "@/pages/shared/Footer";
 import Header from "@/pages/shared/Header";
 import { Outlet } from "react-router-dom";
 
-
 const MainLayouts = () => {
+  usePageViewTracking();
   return (
-    <div >
+    <div>
       <Header></Header>
         <Outlet></Outlet>
       <Footer></Footer>
